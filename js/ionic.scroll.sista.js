@@ -3,7 +3,7 @@
   'use strict';
 
   angular.module('jett.ionic.scroll.sista', ['ionic'])
-    .directive('scrollSista', ['$document', '$timeout', '$ionicScrollDelegate', '$ionicGesture', function($document, $timeout, $ionicScrollDelegate, $ionicGesture) {
+    .directive('scrollSista', ['$document', '$timeout', '$ionicScrollDelegate', function($document, $timeout, $ionicScrollDelegate) {
         var TRANSITION_DELAY = 400;
         var defaultDelay = TRANSITION_DELAY * 2;
         var defaultDuration = TRANSITION_DELAY + 'ms';
@@ -12,23 +12,10 @@
       return {
         restrict: 'A',
         link: function($scope, $element, $attr) {
-          // Check if snapping is enabled
-          var shouldSnap = false;
-          if ($attr.scrollSistaSnap == 'true') {
-            shouldSnap = true;
-          }
-
           var body = $document[0].body;
           var scrollDelegate = $attr.delegateHandle ? $ionicScrollDelegate.$getByHandle($attr.delegateHandle) : $ionicScrollDelegate;
           var scrollView = scrollDelegate.getScrollView();
 
-          // Blocker for the default shrinking behavior
-          var blockShrinking = false;
-          // Indicators for scrolling and dragging states
-          var scrollingActive = false;
-          var dragingActive = false;
-          // Timer to check if scrolling has ended
-          var timer;
           //coordinates
           var y, prevY, prevScrollTop;
           //headers
@@ -147,7 +134,8 @@
            */
           function translateHeaders (y, duration) {
             var fadeAmt = 1 - (y / headerHeight);
-
+            console.log("translating Header");
+            console.log("Y = ", y);
             //translate active header
             translateY(activeHeader, y, duration);
             angular.forEach(activeHeader.children, function (child) {
@@ -192,7 +180,7 @@
               translateHeaders(Math.min(headerEnd, headerY), duration);
 
               //readjust top of ion-content
-              contentStyle.top = Math.max(0, contentTop - y) + 'px';
+              contentStyle.top = Math.max(44, contentTop - y) + 'px';
             });
           }
 
@@ -222,63 +210,30 @@
             }
 
             var duration = 0;
-            var scrollTop = e.detail.scrollTop;
-
+            var scrollTop = $ionicScrollDelegate.getScrollPosition().top;
             y = scrollTop >= 0 ? Math.min(defaultEnd, Math.max(0, y + scrollTop - prevScrollTop)) : 0;
-
             //if we are at the bottom, animate the header/tabs back in
             if (scrollView.getScrollMax().top - scrollTop <= contentTop) {
+
+
               y = 0;
               duration = defaultDuration;
             }
 
+
             prevScrollTop = scrollTop;
 
-            // Check if we are still scrolling
-            if(timer !== null) {
-              clearTimeout(timer);
-            }
-            // Stuff to do when scrolling has ended
-            timer = setTimeout(function() {
-              blockShrinking = false;
-              // Reset scrolling indicator
-              scrollingActive = false;
-
-              // If the header is not fully HIDDEN
-              if (shouldSnap && y < defaultEnd/2) {
-                // And the user is not dragging any more
-                if (!dragingActive) {
-                  // Block the defaut shrinking behavior
-                  blockShrinking = true;
-                  // Snap back to fully SHOW the header 
-                  scrollDelegate.scrollBy(0, -y, true);
-                  y = 0;
-                  prevY = 0;
-                  translateElements(0, defaultDuration);
-                }
-              }
-            }, 100);
-
             //if previous and current y are the same, no need to continue
-            if (prevY === y || blockShrinking) {
+            if (prevY === y) {
               return;
             }
-            prevY = y;
 
+            if (y < 2) {
+              y=0;
+            }
+            prevY = y;
             translateElements(y, duration);
           });
-
-          if (shouldSnap) {
-            // Set/reset the dragging indicator
-            $ionicGesture.on('touch', function(e){
-              // Ensure that shrinking is not blocked when user starts dragging
-              blockShrinking = false;
-              dragingActive = true;
-            }, $element);
-            $ionicGesture.on('release', function(e){
-              dragingActive = false;
-            }, $element);           
-          }
 
         }
       }

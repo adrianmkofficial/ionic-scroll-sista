@@ -1,7 +1,7 @@
 {
-  "name": "ionic-scroll-sista",
+  "name": "ionic-scroll-sista-mod",
   "version": "1.0.2",
-  "description": "An Ionic plugin that will push your headers and tabs away while scrolling to free up more space",
+  "description": "A fork of the ionic-scroll-sista project, modified to fit specific needs in personal work. ORIGINAL DESCRIPTION: An Ionic plugin that will push your headers and tabs away while scrolling to free up more space",
   "author": "Devin Jett <djett41@gmail.com> (https://github.com/djett41)",
   "main": "./dist/ionic.scroll.sista.js",
   "engines": {
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/djett41/ionic-scroll-sista.git"
+    "url": "https://github.com/adrianmkofficial/ionic-scroll-sista.git"
   },
   "devDependencies": {
     "gulp": "^3.5.6",
